@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="78e7c86f-f642-4547-97a3-c37523897cbb" >
+		<http:listener-connection host="0.0.0.0" port="${http.port}" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="f6bd9289-1604-4614-9921-5c58175bbebb" >
+		<db:my-sql-connection host="${db.config.host}" port="${db.config.port}" user="${db.config.user}" password="${db.config.password}" database="${db.config.database}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="3cbf074b-6873-41ee-85b1-23adbfc31b8e" file="dev.config.yaml" />
+	<flow name="demo-fletch-accFlow" doc:id="e01f2990-d7e4-4b72-92d2-7a9d079e790b" >
+		<http:listener doc:name="Listener" doc:id="6db8dea0-4c15-4720-bcc7-6b852e134dd7" config-ref="HTTP_Listener_config" path="fletch"/>
+		<logger level="INFO" doc:name="Logger" doc:id="849a6916-e631-4d71-bb8e-f651b7a8530d" message="The Flow has Begin"/>
+		<db:select doc:id="8f5652cf-1c4c-40cc-9d89-14bab97fc70c" config-ref="Database_Config">
+			<db:sql ><![CDATA[${query.select}]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="8085426c-a2bc-4003-b838-d915b9b91b1b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3127f705-69d7-4433-be11-0cd67144ef84" message="The Flow Has Ended"/>
+	</flow>
+</mule>
